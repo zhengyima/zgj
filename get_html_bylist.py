@@ -53,7 +53,7 @@ list_headers = {
     'cache-control': "no-cache",
     'postman-token': "e1632309-81d3-2580-3cc4-76133c387d26"
 }
-for i in (2, 2518):
+for i in range(2, 2518):
 
     list_html = get_a_page(list_url, list_headers)
     fo = open("./list/" + str(i) + ".html", "wb")
