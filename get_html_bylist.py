@@ -8,9 +8,10 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import requests
 import os
+import re
 
 from pyquery import PyQuery as pq
-
+from HTMLParser import HTMLParser
 
 def get_a_page(url, headers):
     response = requests.request("GET", url, headers=headers)
@@ -24,20 +25,52 @@ def get_a_book(url,headers,filename):
         fname = fname + b + '-'
     response = requests.request("GET", url, headers=headers)
     # fo = open("./"+filename+".html", "wb")
-    fo = open("./" + fname + ".html", "wb")
+    fo = open("./book/" + fname + ".html", "wb")
     fo.write(response.text)
     fo.close()
 
-    doc = pq(filename="./" + fname + ".html")
+    doc = pq(filename="./book/" + fname + ".html")
 
     if len(doc('.f14')) == 0:
-        os.remove("./" + fname + ".html")
-        return
+        os.remove("./book/" + fname + ".html")
+        return 0
 
     data_f14 = pq(doc('.f14')[0])
 
     a_label = data_f14('a').eq(0).attr('href')
+    return 1
 
+def get_txt_from_book(filename):
+
+    filename_blocks = filename.split('/')
+
+    fname = ''
+    for b in filename_blocks:
+        fname = fname + b + '-'
+
+    doc = pq(filename = "./book/" + fname + ".html")
+
+    contentarea = doc('#contentArea')
+    #print contentarea
+    #print contentarea.html()
+    dr = re.compile(r'<[^>]+>', re.S)
+    #stext = dr.sub('', pq(contentarea).__str__())
+    stext = dr.sub('', pq(contentarea).__str__()).replace('&#13;','').replace('&#xa0;','')
+
+
+
+    fo = open("./txt/" + fname + ".txt", "wb")
+    fo.write(HTMLParser().unescape(stext))
+    fo.close()
+    '''
+    spans = pq(contentarea('span'))
+
+    stext = ''
+    for span in spans:
+        stext = stext + pq(span).html() + "\n"
+        #print span
+    print stext
+    '''
 
 list_url = "http://www.ajxxgk.jcy.cn/html/zjxflws/2.html"
 
@@ -74,7 +107,8 @@ for i in range(2, 2518):
         url_blocks = url.split('/')
         fname = url_blocks[2]+ '/' + url_blocks[3] + '/' + url_blocks[4].split('.')[0]
 
-        get_a_book(book_url,list_headers,fname)
+        if get_a_book(book_url,list_headers,fname) == 1:
+            get_txt_from_book(fname)
 
         cnt += 1
         print cnt
