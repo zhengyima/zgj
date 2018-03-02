@@ -84,7 +84,7 @@ for i in (2, 2518):
 
 
     list_url = "http://www.ajxxgk.jcy.cn/html/zjxflws/" + str(i + 1) + ".html"
-    print "-------------------------"
+    print str(i)+"-------------------------"
 
 
 
