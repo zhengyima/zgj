@@ -14,7 +14,7 @@ from pyquery import PyQuery as pq
 from HTMLParser import HTMLParser
 
 def get_a_page(url, headers):
-    response = requests.request("GET", url, headers=headers)
+    response = requests.request("GET", url, headers=headers,timeout=10)
     return response.text
 
 def get_a_book(url,headers,filename):
@@ -23,7 +23,10 @@ def get_a_book(url,headers,filename):
     fname = ''
     for b in filename_blocks:
         fname = fname + b + '-'
-    response = requests.request("GET", url, headers=headers)
+    try:
+        response = requests.request("GET", url, headers=headers,timeout=10)
+    except requests.exceptions.Timeout:
+
     # fo = open("./"+filename+".html", "wb")
     fo = open("./book/" + fname + ".html", "wb")
     fo.write(response.text)
