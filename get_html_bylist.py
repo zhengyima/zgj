@@ -14,7 +14,10 @@ from pyquery import PyQuery as pq
 from HTMLParser import HTMLParser
 
 def get_a_page(url, headers):
-    response = requests.request("GET", url, headers=headers)
+    try:
+    	response = requests.request("GET", url, headers=headers,timeout=10)
+    except requests.exceptions.Timeout:
+	return 0
     return response.text
 
 def get_a_book(url,headers,filename):
@@ -23,7 +26,10 @@ def get_a_book(url,headers,filename):
     fname = ''
     for b in filename_blocks:
         fname = fname + b + '-'
-    response = requests.request("GET", url, headers=headers)
+    try:
+    	response = requests.request("GET", url, headers=headers,timeout=3)
+    except requests.exceptions.Timeout:
+    	return 0
     # fo = open("./"+filename+".html", "wb")
     fo = open("./book/" + fname + ".html", "wb")
     fo.write(response.text)
@@ -86,9 +92,11 @@ list_headers = {
     'cache-control': "no-cache",
     'postman-token': "e1632309-81d3-2580-3cc4-76133c387d26"
 }
-for i in range(2, 2518):
+for i in range(2250, 2518):
 
     list_html = get_a_page(list_url, list_headers)
+    if list_html == 0:
+    	continue
     fo = open("./list/" + str(i) + ".html", "wb")
     fo.write(list_html)
     fo.close()
